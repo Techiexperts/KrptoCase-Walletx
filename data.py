@@ -1,3 +1,8 @@
+import requests
+import pprint
+r=requests.get('https://api.coincap.io/v2/assets/bitcoin')
+s=requests.get('https://api.coincap.io/v2/assets/ripple')
+
 def databaseCreator():
     import mysql.connector
     
@@ -12,8 +17,8 @@ def databaseCreator():
     fetchdata=cur.fetchall()
 
     if fetchdata==[]:
-        cur.execute('insert into cryptodata(Name,Market_Cap,Price,Volume,Circulating_Supply,Change_24h) values(%s,%s,%s,%s,%s,%s)',('Bitcoin','$130097977794','$7200.20','$22917521651','18068650 BTC','-0.39%'))
-        cur.execute('insert into cryptodata(Name,Market_Cap,Price,Volume,Circulating_Supply,Change_24h) values(%s,%s,%s,%s,%s,%s)',('Ethereum','$16042430757','$147.58','$7837436868','108702955 ETH','-0.44%'))
+        cur.execute('insert into cryptodata(Name,Market_Cap,Price,Volume,Circulating_Supply,Change_24h) values(%s,%s,%s,%s,%s,%s)',(r.json()['data']['id'],r.json()['data']['marketCapUsd'],'$7200.20','$22917521651','18068650 BTC','-0.39%'))
+        cur.execute('insert into cryptodata(Name,Market_Cap,Price,Volume,Circulating_Supply,Change_24h) values(%s,%s,%s,%s,%s,%s)',(s.json()['data']['id'],'$16042430757','$147.58','$7837436868','108702955 ETH','-0.44%'))
         cur.execute('insert into cryptodata(Name,Market_Cap,Price,Volume,Circulating_Supply,Change_24h) values(%s,%s,%s,%s,%s,%s)',('XRP','$9549596416','$0.220546','$1388391306','43299885509 XRP','-0.02%'))
         cur.execute('insert into cryptodata(Name,Market_Cap,Price,Volume,Circulating_Supply,Change_24h) values(%s,%s,%s,%s,%s,%s)',('Tether','$4174187062','$1.02','$24593296896','4108044456 USDT','1.47%'))
         cur.execute('insert into cryptodata(Name,Market_Cap,Price,Volume,Circulating_Supply,Change_24h) values(%s,%s,%s,%s,%s,%s)',('Bitcoin_Cash','$3865731673','$213.17','$1895892271','18134463 BCH','0.54%'))
