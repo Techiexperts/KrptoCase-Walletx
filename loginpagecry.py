@@ -538,13 +538,13 @@ def show_favourites():
         root.anchor(anchor='center')
 
         #label text list
-        labtxt=['S.NO.','Name','Market_Cap','Price','Volume','Circulating_Supply','Change_24h']
+        labtxt=['S.No.','Name','Market_Cap','Price','Volume','Circulating_Supply','Change_24h']
         labl=[]
         for i in range(7):
             if i==0 or i==1:
-                Label(root,text=labtxt[i],font=('Consolas','14','bold'),relief=SOLID).grid(row=0,column=i,ipady=3,ipadx=3,padx=1,sticky='nsew')
+                Label(root,text=labtxt[i],font=('Consolas','14','bold','underline'),relief=SOLID).grid(row=0,column=i,ipady=3,ipadx=3,padx=1,sticky='nsew')
             else:
-                labl.append(Label(root,text=labtxt[i],font=('Consolas','14','bold','underline'),relief=SOLID))
+                labl.append(Label(root,text=labtxt[i],font=('Consolas','14','bold','underline'),relief=SOLID,cursor='hand2'))
                 labl[-1].grid(row=0,column=i,ipady=3,ipadx=3,padx=1,sticky='nsew')
                 labl[-1].bind('<Button-1>',show_graph)
 
@@ -554,7 +554,7 @@ def show_favourites():
         #label list for creating labels binded to an event
         labellist=[]
         for i in range(1,len(cryptodata)+1):
-            labellist.append(Label(root,text=cryptodata[i-1][1],font=('Consolas','14','underline','bold'),relief=SUNKEN))
+            labellist.append(Label(root,text=cryptodata[i-1][1],font=('Consolas','14','underline','bold'),relief=SUNKEN,cursor='hand2'))
             labellist[-1].grid(row=i,column=1,ipady=3,ipadx=3,sticky='nsew',pady=1,padx=1)
             labellist[-1].bind("<Button-1>",display_info)
 
@@ -647,54 +647,6 @@ def show_graph(event):
 
 ##########################################################################################
 
-#for creating a right pane where all the options regarding user is displayed
-def options(event):
-    #adding a pane
-    pane=PanedWindow(root,bg='maroon',height=1400,width=300,orient='vertical',relief='ridge',borderwidth=5)
-    pane.place(x=1000,y=0)
-
-    #adding widgets in pane
-    back=Button(pane,text="Back",command=mainWin,font=('Consolas','14','bold'))
-    pane.add(back)
-    back.place(x=15,y=5)
-
-    label_l=['Balance(BTC):-','Balance(USD):-']
-    pad=100
-    for i in range(0,2):
-        l=Label(pane,text=label_l[i],font=('Consolas','14'),bg='maroon',fg='white')
-        pane.add(l)
-        l.place(x=2,y=pad)
-        pad+=40
-
-    #connection establishment and fetching no. of bticoins and price from table
-    conn=mysql.connector.connect(user='root',host='localhost',passwd='Subinsk284@',database='crypto')
-    cur=conn.cursor()
-    cur.execute('use crypto')
-    cur.execute('select Bitcoins from userlog where emailaddress=(%s)',(emailadd.get(),))
-    fetchdata=cur.fetchone()
-    cur.execute('select Price from cryptodata where SNo=1')
-    fetchprice=cur.fetchone()
-    cur.close()
-    conn.close()
-    
-    l=Label(pane,text=fetchdata[0]+' BTC',font=('Consolas','14'),bg='maroon',fg='white')
-    pane.add(l)
-    l.place(x=180,y=100)
-    
-    balance_eval=fetchprice[0][1::]+'*'+fetchdata[0]
-    l=Label(pane,text='$'+str(eval(balance_eval)),font=('Consolas','14'),bg='maroon',fg='white')
-    pane.add(l)
-    l.place(x=165,y=140)
-    
-    Button(pane,text='Send Bitcoins',width=20,command=sendDetails,font=('Consolas','16','bold')).place(x=20,y=250)
-    Button(pane,text='Receive Bitcoins',width=20,command=receive,font=('Consolas','16','bold')).place(x=20,y=310)
-    Button(pane,text='Sell Bitcoins',width=20,command=sellDetails,font=('Consolas','16','bold')).place(x=20,y=370)
-    Button(pane,text='Buy Bitcoins',width=20,command=buyDetails,font=('Consolas','16','bold')).place(x=20,y=430)
-    Button(pane,text='Your Favourites',width=20,command=show_favourites,font=('Consolas','16','bold')).place(x=20,y=490)
-    Button(pane,text='Delete Your Account',width=20,command=delete_account,font=('Consolas','16','bold')).place(x=20,y=550)
-    
-##########################################################################################
-
 #for refreshing cryptodata table
 def refresh(event):
     #connection establishment and updating cryptodata table
@@ -726,9 +678,86 @@ Circulating_Supply=(%s),Change_24h=(%s) where SNo=10',('$'+str(randint(100000000
     conn.close()
 
     if event.widget.cget('cursor')=='hand1':
-        mainWin()
+        showTable()
     else:
         show_favourites()
+
+##########################################################################################
+        
+#for showing table of top 10 cryptocurrencies
+def showTable():
+    #clears the root. 
+    l=root.winfo_children()
+    for i in l:
+        i.destroy()
+        
+    #root resizing
+    root.geometry('1300x700+0+0')
+    root.maxsize(1300,700)
+    root.minsize(1300,700)
+
+    img=PhotoImage(file='edited1.png')
+    image_label=Label(root,image=img,width=1300,height=700)
+    image_label.place(x=0,y=0)
+    image_label.image=img
+
+    Button(root,text="Back",command=mainWin,font=('Consolas','14','bold')).place(x=20,y=10)
+
+    '''''''''''''''''''''''''''
+            data table
+    '''''''''''''''''''''''''''
+    
+    root.anchor(anchor='center')
+
+    #label text list
+    labtxt=['S.No.','Name','Market_Cap','Price','Volume','Circulating_Supply','Change_24h']
+    labl=[]
+    for i in range(7):
+        if i==0 or i==1:
+            Label(root,text=labtxt[i],font=('Consolas','14','bold','underline'),relief=SOLID).grid(row=0,column=i,ipady=3,ipadx=3,padx=1,sticky='nsew')
+        else:
+            labl.append(Label(root,text=labtxt[i],font=('Consolas','14','bold','underline'),cursor='hand2',relief=SOLID))
+            labl[-1].grid(row=0,column=i,ipady=3,ipadx=3,padx=1,sticky='nsew')
+            labl[-1].bind('<Button-1>',show_graph)
+
+    #connection establishment and displaying cryptodata table
+    conn=mysql.connector.connect(user='root',host='localhost',passwd='Subinsk284@',database='crypto')
+    cur=conn.cursor()
+    cur.execute('use crypto')
+    cur.execute('select * from cryptodata')
+    fetchdata=cur.fetchall()
+    cur.close()
+    conn.close()
+    
+    for i in range(1,11):
+        Label(root,text=i,font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,ipady=3,ipadx=3,pady=1,padx=1,sticky='nsew')
+
+    #label list for creating labels binded to an event
+    labellist=[]
+    for i in range(1,11):
+        labellist.append(Label(root,text=fetchdata[i-1][1],font=('Consolas','14','underline','bold'),cursor='hand2',relief=SUNKEN))
+        labellist[-1].grid(row=i,column=1,ipady=3,ipadx=3,sticky='nsew',pady=1,padx=1)
+        labellist[-1].bind("<Button-1>",display_info)
+
+    #remaining fields of cryptodata table
+    for i in range(1,11):
+        Label(root,text=fetchdata[i-1][2],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=2,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
+        Label(root,text=fetchdata[i-1][3],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=3,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
+        Label(root,text=fetchdata[i-1][4],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=4,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
+        Label(root,text=fetchdata[i-1][5],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=5,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
+        Label(root,text=fetchdata[i-1][6],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=6,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
+
+    #Add to favourite button
+    butlist=[]
+    but_txtlist=['Bitcoin','Ethereum','XRP','Tether','Bitcoin_Cash','Litecoin','EOS','Binance_Coin','Bitcoin_SV','Stellar']
+    for i in range(1,11):
+        butlist.append(Button(root,text='Add %s to favourites'%(but_txtlist[i-1]),font=('OCR-A-Extended','14','bold')))
+        butlist[-1].grid(row=i,column=7,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
+        butlist[-1].bind('<Button-1>',add_favourites)
+                    
+    b=Button(root,text='Refresh',cursor='hand1',font=('Consolas','16','bold'))
+    b.place(x=600,y=650)    
+    b.bind('<Button-1>',refresh)
 
 ##########################################################################################
 
@@ -928,69 +957,44 @@ def mainWin():
     root.title('Welcome %s - KRYPTON WALLET'%fetchdata[0])
     
     #account login status and logout
-    l=Label(root,text='Hi,%s'%(fetchdata[0]),bg='skyblue',fg='darkgreen',font=('Consolas','20','underline'))
-    l.place(x=950,y=10)
-    l.bind('<Button-1>',options)
+    l=Label(root,text='Hi,%s'%(fetchdata[0]),bg='skyblue',fg='darkgreen',font=('Consolas','14'))
+    l.place(x=20,y=10)
     
-    Button(root,text='Log Out',command=loglayout,font=('Consolas','14','bold')).place(x=20,y=10)
+    Button(root,text='Log Out',command=loglayout,font=('Consolas','14','bold')).place(x=1200,y=10)
 
+    label_l=['Balance(BTC):-','Balance(USD):-']
+    pad=70
+    for i in range(0,2):
+        l=Label(root,text=label_l[i],font=('Consolas','14'),bg='skyblue',fg='darkgreen')
+        l.place(x=1080,y=pad)
+        pad+=30
 
-    '''''''''''''''''''''''''''
-            data table
-    '''''''''''''''''''''''''''
-    
-    root.anchor(anchor='center')
-
-    #label text list
-    labtxt=['S.NO.','Name','Market_Cap','Price','Volume','Circulating_Supply','Change_24h']
-    labl=[]
-    for i in range(7):
-        if i==0 or i==1:
-            Label(root,text=labtxt[i],font=('Times New Roman','14','bold'),relief=SOLID).grid(row=0,column=i,ipady=3,ipadx=3,padx=1,sticky='nsew')
-        else:
-            labl.append(Label(root,text=labtxt[i],font=('Consolas','14','bold','underline'),relief=SOLID))
-            labl[-1].grid(row=0,column=i,ipady=3,ipadx=3,padx=1,sticky='nsew')
-            labl[-1].bind('<Button-1>',show_graph)
-
-    #connection establishment and displaying cryptodata table
+    #connection establishment and fetching no. of bticoins and price from table
     conn=mysql.connector.connect(user='root',host='localhost',passwd='Subinsk284@',database='crypto')
     cur=conn.cursor()
     cur.execute('use crypto')
-    cur.execute('select * from cryptodata')
-    fetchdata=cur.fetchall()
+    cur.execute('select Bitcoins from userlog where emailaddress=(%s)',(emailadd.get(),))
+    fetchdata=cur.fetchone()
+    cur.execute('select Price from cryptodata where SNo=1')
+    fetchprice=cur.fetchone()
     cur.close()
     conn.close()
     
-    for i in range(1,11):
-        Label(root,text=i,font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,ipady=3,ipadx=3,pady=1,padx=1,sticky='nsew')
+    l=Label(root,text=fetchdata[0]+' BTC',font=('Consolas','14'),bg='skyblue',fg='darkgreen')
+    l.place(x=1230,y=70)
+    
+    balance_eval=fetchprice[0][1::]+'*'+fetchdata[0]
+    l=Label(root,text='$'+str(eval(balance_eval)),width=5,font=('Consolas','14'),bg='skyblue',fg='darkgreen')
+    l.place(x=1230,y=100)
 
-    #label list for creating labels binded to an event
-    labellist=[]
-    for i in range(1,11):
-        labellist.append(Label(root,text=fetchdata[i-1][1],font=('Consolas','14','underline','bold'),relief=SUNKEN))
-        labellist[-1].grid(row=i,column=1,ipady=3,ipadx=3,sticky='nsew',pady=1,padx=1)
-        labellist[-1].bind("<Button-1>",display_info)
-
-    #remaining fields of cryptodata table
-    for i in range(1,11):
-        Label(root,text=fetchdata[i-1][2],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=2,pady=1,padx=1,ipady=3,ipadx=3,sticky='nsew')
-        Label(root,text=fetchdata[i-1][3],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=3,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
-        Label(root,text=fetchdata[i-1][4],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=4,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
-        Label(root,text=fetchdata[i-1][5],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=5,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
-        Label(root,text=fetchdata[i-1][6],font=('Consolas','14','bold'),relief=SUNKEN).grid(row=i,column=6,padx=1,pady=1,ipady=3,ipadx=3,sticky='nsew')
-
-    #Add to favourite button
-    butlist=[]
-    but_txtlist=['Bitcoin','Ethereum','XRP','Tether','Bitcoin_Cash','Litecoin','EOS','Binance_Coin','Bitcoin_SV','Stellar']
-    for i in range(1,11):
-        butlist.append(Button(root,text='Add %s to favourites'%(but_txtlist[i-1]),font=('OCR-A-Extended','14','bold')))
-        butlist[-1].grid(row=i,column=7,pady=1,padx=7,ipady=3,ipadx=3,sticky='nsew')
-        butlist[-1].bind('<Button-1>',add_favourites)
-                    
-    b=Button(root,text='Refresh',cursor='hand1',font=('Consolas','16','bold'))
-    b.place(x=600,y=650)    
-    b.bind('<Button-1>',refresh)
-
+    Button(root,text='Top 10 cryptocurrencies',width=58,command=showTable,font=('Consolas','16','bold')).place(x=300,y=200)
+    Button(root,text='Send Bitcoins',width=20,command=sendDetails,font=('Consolas','16','bold')).place(x=300,y=300)
+    Button(root,text='Receive Bitcoins',width=20,command=receive,font=('Consolas','16','bold')).place(x=300,y=400)
+    Button(root,text='Sell Bitcoins',width=20,command=sellDetails,font=('Consolas','16','bold')).place(x=300,y=500)
+    Button(root,text='Buy Bitcoins',width=20,command=buyDetails,font=('Consolas','16','bold')).place(x=750,y=300)
+    Button(root,text='Your Favourites',width=20,command=show_favourites,font=('Consolas','16','bold')).place(x=750,y=400)
+    Button(root,text='Delete Your Account',width=20,command=delete_account,font=('Consolas','16','bold')).place(x=750,y=500)
+    
     Label(root,text='**©Copyrights owned by Chaitanya Agarwal**',font=('Consolas','11','bold'),bg='skyblue',fg='darkgreen').place(x=957,y=680)
 
 ##########################################################################################
